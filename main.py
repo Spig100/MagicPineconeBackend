@@ -1,13 +1,11 @@
 from fastapi import FastAPI
 
+from routers import test
+
 app = FastAPI()
 
+app.include_router(test.router)
 
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
-
-
-@app.get("/hello/{name}")
-async def say_hello(name: str):
-    return {"message": f"Hello {name}"}
+def root():
+    return {"message": "Welcome to Amazing Pinecone Backend!"}
