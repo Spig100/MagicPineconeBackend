@@ -1,0 +1,30 @@
+version: '3.8'
+
+service:
+  magic_pinecone:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: magic_pinecone_backend
+    expose:
+      - "8000"
+    network:
+      - apim_network
+    restart: unless-stopped
+
+  digirunner:
+    image: tpisoftwareopensource/digirunner-open-source:release-v4.7.3
+    container_name: digirunner_gateway
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    networks:
+      - apim_network
+    depends_on:
+      - fastapi-backend
+    restart: unless-stopped
+
+networks:
+  apim_network:
+    driver: bridge
