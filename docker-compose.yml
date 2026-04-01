@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   magic_pinecone:
     build:
@@ -42,7 +40,7 @@ services:
     networks:
       - apim_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U magic_user -d magic_pinecone"]
+      test: [ "CMD-SHELL", "pg_isready -U magic_user -d magic_pinecone" ]
       interval: 5s
       timeout: 5s
       retries: 5
