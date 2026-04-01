@@ -1,6 +1,6 @@
 version: '3.8'
 
-service:
+services:
   magic_pinecone:
     build:
       context: .
@@ -8,7 +8,10 @@ service:
     container_name: magic_pinecone_backend
     expose:
       - "8000"
-    network:
+
+    ports:
+      - "8000:8000"
+    networks:
       - apim_network
     restart: unless-stopped
 
@@ -16,13 +19,11 @@ service:
     image: tpisoftwareopensource/digirunner-open-source:release-v4.7.3
     container_name: digirunner_gateway
     ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
+      - "18080:18080"
     networks:
       - apim_network
     depends_on:
-      - fastapi-backend
+      - magic_pinecone
     restart: unless-stopped
 
 networks:
