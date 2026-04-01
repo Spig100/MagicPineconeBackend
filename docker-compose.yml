@@ -26,6 +26,17 @@ services:
       - magic_pinecone
     restart: unless-stopped
 
+  db:
+    image: postgres
+    container_name: magic_pinecone_db
+    ports:
+      - "5432:5432"
+    networks:
+      - apim_network
+    depends_on:
+      - magic_pinecone
+    restart: unless-stopped
+
 networks:
   apim_network:
     driver: bridge
