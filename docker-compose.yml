@@ -6,13 +6,17 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: magic_pinecone_backend
+    env_file:
+      - .env
     expose:
       - "8000"
-
     ports:
       - "8000:8000"
     networks:
       - apim_network
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
   digirunner:
@@ -29,12 +33,19 @@ services:
   db:
     image: postgres
     container_name: magic_pinecone_db
+    environment:
+      POSTGRES_USER: magic_user
+      POSTGRES_PASSWORD: magic_password
+      POSTGRES_DB: magic_pinecone
     ports:
       - "5432:5432"
     networks:
       - apim_network
-    depends_on:
-      - magic_pinecone
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U magic_user -d magic_pinecone"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
 networks:
