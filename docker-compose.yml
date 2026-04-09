@@ -1,28 +1,49 @@
-version: '3.8'
-
-service:
+services:
   magic_pinecone:
     build:
       context: .
       dockerfile: Dockerfile
     container_name: magic_pinecone_backend
+    env_file:
+      - .env
     expose:
       - "8000"
-    network:
+    ports:
+      - "8000:8000"
+    networks:
       - apim_network
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
   digirunner:
     image: tpisoftwareopensource/digirunner-open-source:release-v4.7.3
     container_name: digirunner_gateway
     ports:
-      - "80:80"
-      - "443:443"
-      - "8080:8080"
+      - "18080:18080"
     networks:
       - apim_network
     depends_on:
-      - fastapi-backend
+      - magic_pinecone
+    restart: unless-stopped
+
+  db:
+    image: postgres
+    container_name: magic_pinecone_db
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    networks:
+      - apim_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     restart: unless-stopped
 
 networks:

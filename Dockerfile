@@ -7,10 +7,14 @@ ENV UV_NO_CACHE=1\
 
 WORKDIR /app
 
-COPY pyproject.toml ./
+# 準備 psycopg2 需要的編譯環境
+RUN apt-get update && apt-get install -y gcc libpq-dev && rm -rf /var/lib/apt/lists/*
 
-RUN uv pip install --system -r pyproject.toml
+COPY pyproject.toml uv.lock ./
+# 透過 uv sync 建立環境
+RUN uv sync --frozen
 
 COPY . .
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# 透過 uv run 啟動 uvicorn，確保讀取到虛擬環境
+CMD ["uv", "run", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
