@@ -67,3 +67,11 @@
    ```bash
    uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000
    ```
+
+---
+
+## 🏆 致謝 (Acknowledgments)
+
+特別感謝以下專案為本後端的課程爬蟲功能提供實作靈感與參考：
+
+- **Course Finder Fetcher**: [NCU-Course-Finder-DataFetcher-v2](https://github.com/zetaraku/NCU-Course-Finder-DataFetcher-v2)
