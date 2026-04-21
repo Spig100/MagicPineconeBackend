@@ -5,3 +5,6 @@
 .idea/modules.xml
 .idea/vcs.xml
 .idea/inspectionProfiles/profiles_settings.xml
+__pycache__/
+*.py[cod]
+*$py.class
