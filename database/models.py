@@ -39,3 +39,4 @@ class Course(Base):
     course_type = Column(String, nullable=True) # e.g. REQUIRED, ELECTIVE
 
     department = relationship("Department", back_populates="courses")
+    college = relationship("College")

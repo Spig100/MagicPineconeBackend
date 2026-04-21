@@ -27,11 +27,14 @@ async def fetch_colleges_with_departments():
         response.raise_for_status()
         
         soup = BeautifulSoup(response.text, 'html.parser')
-        tbody = soup.select_one('#byUnion_table table > tbody')
-        if not tbody:
+        table_container = soup.select_one('#byUnion_table')
+        if not table_container:
             return colleges
         
-        tables = tbody.find_all('table', recursive=False)
+        tables = table_container.find_all('table', recursive=False)
+        # Note: the html structure puts college tables directly under the main table or its tr/td
+        # To be safe against nested structures, let's just find them by selector:
+        tables = soup.select('#byUnion_table table')
         for i, table in enumerate(tables):
             college_id = f"collegeI{i}"
             tr1 = table.find('tr')
@@ -189,8 +192,15 @@ async def sync_courses_to_db(db: Session):
             
         logger.info(f"Fetched {len(all_courses)} total courses from XML.")
         
-        # Merge all courses into DB
+        # Deduplicate locally to prevent UniqueViolation for cross-listed courses 
+        # in the same uncommitted transaction batch.
+        unique_courses = {}
         for cd in all_courses:
+            if cd.get('serial_no'):
+                unique_courses[cd['serial_no']] = cd
+                
+        # Merge all unique courses into DB
+        for cd in unique_courses.values():
             db_course = db.query(Course).filter(Course.serial_no == cd['serial_no']).first()
             if not db_course:
                 db_course = Course(**cd)
